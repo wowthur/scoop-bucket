@@ -1,0 +1,15 @@
+{
+    "version": "0.27",
+    "description": "A digital logic designer and circuit simulator.",
+    "url": "https://github.com/hneemann/Digital/releases/download/v0.27/Digital.zip",
+    "hash": "a93b9dd70ed5b051bf04aacc37f2794c3c3d17f214ab99f0c8f4a36e55bbe835",
+    "homepage": "https://github.com/hneemann/Digital",
+    "checkver": "github",
+    "extract_dir": "Digital",
+    "shortcuts": [
+        [
+            "Digital.exe",
+            "Digital"
+        ]
+    ]
+}
