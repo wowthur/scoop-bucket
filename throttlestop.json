@@ -15,7 +15,8 @@
     ],
     "persist": [
         "Logs",
-        "ThrottleStop.ini"
+        "ThrottleStop.ini",
+        "WinPowerPlans.txt"
     ],
     "checkver": "ThrottleStop\\s+([\\d.]+)",
     "autoupdate": {
