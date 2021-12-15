@@ -1,14 +1,14 @@
 {
-    "version": "10.0.4",
+    "version": "10.1",
     "description": "Ghidra is a software reverse engineering (SRE) framework",
-    "url": "https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_10.0.4_build/ghidra_10.0.4_PUBLIC_20210928.zip",
-    "hash": "sha256:1ce9bdf2d7f6bdfe5dccd06da828af31bc74acfd800f71ade021d5211e820d5e",
+    "url": "https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_10.1_build/ghidra_10.1_PUBLIC_20211210.zip",
+    "hash": "sha256:99139c4a63a81135b3b63fe9997a012a6394a766c2c7f2ac5115ab53912d2a6c",
     "homepage": "https://github.com/NationalSecurityAgency/ghidra",
     "checkver": {
         "github": "https://github.com/NationalSecurityAgency/ghidra",
         "re": "Ghidra_([\\d.]+)_build"
     },
-    "extract_dir": "ghidra_10.0.4_PUBLIC",
+    "extract_dir": "ghidra_10.1_PUBLIC",
     "shortcuts": [
         [
             "ghidraRun.bat",
