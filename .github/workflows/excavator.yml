@@ -1,0 +1,82 @@
+name: Excavator
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  excavator:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Scoop
+        shell: powershell
+        run: |
+          Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+          irm get.scoop.sh | iex
+          Add-Content $env:GITHUB_PATH "$env:USERPROFILE\scoop\shims"
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check and update manifests
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $checkver = "$env:USERPROFILE\scoop\apps\scoop\current\bin\checkver.ps1"
+          $dir = $env:GITHUB_WORKSPACE
+
+          $manifests = Get-ChildItem -Path $dir -Filter "*.json" -File | Where-Object {
+            try {
+              $json = Get-Content $_.FullName -Raw | ConvertFrom-Json
+              $null -ne $json.checkver
+            } catch { $false }
+          }
+
+          foreach ($manifest in $manifests) {
+            $app = $manifest.BaseName
+            Write-Host "Checking $app..."
+
+            & $checkver $app -u -dir $dir
+
+            $changed = git -C $dir diff --name-only $manifest.Name
+            if (-not $changed) {
+              Write-Host "$app is up to date."
+              continue
+            }
+
+            $newVersion = (Get-Content $manifest.FullName -Raw | ConvertFrom-Json).version
+            $branch = "update/$app-$newVersion"
+
+            $existingPR = gh pr list --head $branch --json number --jq '.[0].number' 2>$null
+            if ($existingPR) {
+              Write-Host "PR already exists for $app $newVersion, skipping."
+              git -C $dir checkout -- $manifest.Name
+              continue
+            }
+
+            git -C $dir checkout -b $branch
+            git -C $dir add $manifest.Name
+            git -C $dir commit -m "Update: $app to $newVersion"
+            git -C $dir push origin $branch
+
+            gh pr create `
+              --title "Update $app to $newVersion" `
+              --body "Automated checkver update.$("`n`n")Merge to install." `
+              --base main `
+              --head $branch
+
+            git -C $dir checkout main
+            git -C $dir branch -d $branch
+
+            Write-Host "PR created for $app $newVersion."
+          }
